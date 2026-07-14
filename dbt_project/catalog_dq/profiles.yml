@@ -1,0 +1,6 @@
+catalog_dq:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: ../../catalog.duckdb

@@ -1,0 +1,8 @@
+pandas
+faker
+great_expectations
+dbt-core==1.11.12
+dbt-duckdb==1.10.1
+duckdb==1.5.4
+streamlit
+mashumaro==3.12

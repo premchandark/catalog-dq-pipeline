@@ -1,0 +1,20 @@
+version: 2
+
+models:
+  - name: stg_catalog
+    columns:
+      - name: product_id
+        tests: [not_null, unique]
+      - name: category
+        tests: [not_null]
+
+  - name: fact_catalog_defects
+    description: "Counts defects by vendor, category, and defect type"
+
+  - name: defect_summary
+    description: "Summarizes defect rates by category"
+    columns:
+      - name: category
+        tests: [not_null]
+      - name: defect_rate_pct
+        description: "Percentage of defective products"
