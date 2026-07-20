@@ -1,227 +1,189 @@
-# Catalog Data Quality Pipeline
+Catalog Data Quality Platform
+**Why I Built This**
 
-An end-to-end data engineering pipeline that generates a realistic multi-vendor e-commerce product catalog, detects data quality issues, automatically remediates safe defects, transforms the data using dbt, orchestrates the workflow with Apache Airflow, and visualizes quality metrics through an interactive Streamlit dashboard.
+Every data team depends on high-quality data.
 
----
-## Project Overview
+Whether it's powering product recommendations, search results, pricing engines, or AI models, poor-quality data eventually becomes a business problem.
 
-E-commerce platforms rely on high-quality catalog data for search, recommendations, pricing, and customer experience. However, product data often contains issues such as missing prices, invalid categories, broken image URLs, or incomplete product information.
+Missing product information, invalid categories, broken image URLs, or incorrect pricing don't just affect customers—they also reduce the reliability of analytics and machine learning systems.
 
-This project simulates that real-world scenario by generating a synthetic product catalog, identifying data quality issues, applying rule-based validation, automatically fixing safe-to-remediate defects, and presenting the results through an analytics dashboard.
+I built this project to understand how modern data engineering teams improve data quality before it reaches downstream consumers.
 
----
-## Pipeline Architecture
+Instead of treating data quality as a manual process, this platform automatically detects defects, classifies them, remediates deterministic issues, transforms the cleaned data, and exposes quality metrics through an analytics dashboard.
 
-```
-Synthetic Catalog
-        │
-        ▼
-Data Validation
-        │
-        ▼
+**Problem Statement**
+
+Imagine an e-commerce marketplace where product data arrives from multiple vendors every day.
+
+Because each vendor follows different standards, the catalog quickly becomes inconsistent.
+
+Typical issues include:
+
+Missing prices
+Invalid categories
+Broken image URLs
+Incomplete product titles
+Incorrect values
+
+If these issues are not detected early, they propagate into search engines, recommendation systems, BI dashboards, and AI applications.
+
+The challenge is building an automated pipeline that continuously validates, repairs, and monitors catalog quality without manual intervention.
+
+**Project Goal**
+
+The objective was to design a production-style data quality platform capable of:
+
+✅ Simulating multi-vendor product data
+
+✅ Detecting common quality issues
+
+✅ Automatically remediating deterministic defects
+
+✅ Tracking every remediation through audit logs
+
+✅ Transforming cleaned datasets into analytics-ready models
+
+✅ Providing stakeholders with real-time quality metrics
+
+System Architecture
+
+(Architecture diagram here)
+
+Synthetic Catalog Generator
+            │
+            ▼
+Validation Engine
+            │
+            ▼
 Defect Classification
-        │
-        ▼
+            │
+            ▼
 Auto Remediation
-        │
-        ▼
-DuckDB + dbt
-        │
-        ▼
+            │
+            ▼
+DuckDB
+            │
+            ▼
+dbt Models
+            │
+            ▼
 Streamlit Dashboard
-```
 
-Apache Airflow orchestrates the complete workflow.
+Entire workflow orchestrated using Apache Airflow.
 
----
-## Features
+Engineering Decisions
 
-- Generate realistic multi-vendor catalog data
-- Detect common product catalog quality issues
-- Classify defects by type and category
-- Automatically remediate safe defects
-- Maintain remediation audit logs
-- Transform data using dbt
-- Orchestrate pipeline using Airflow
-- Interactive Streamlit dashboard
+This is the section recruiters actually read.
 
----
-## Tech Stack
+**Why Synthetic Data?**
 
-| Category | Technologies |
-|----------|--------------|
-| Language | Python |
-| Data Processing | Pandas, Faker |
-| Data Warehouse | DuckDB |
-| Data Modeling | dbt |
-| Orchestration | Apache Airflow |
-| Dashboard | Streamlit |
-| Containerization | Docker |
-| Version Control | Git, GitHub |
+Access to production catalog data is restricted.
 
----
-## Project Structure
+Instead of relying on public datasets, I generated realistic vendor data using Faker while intentionally injecting quality defects to simulate production scenarios.
 
-```text
-catalog-dq-pipeline/
-│
-├── data/
-├── data_quality/
-├── defect_detection/
-├── remediation/
-├── dbt_project/
-├── orchestration/
-├── dashboard/
-├── docs/
-├── data_generator.py
-├── requirements.txt
-└── README.md
-```
----
-## Workflow
+**Why Rule-Based Validation?**
 
-### 1. Generate Catalog
+Many data quality issues follow deterministic business rules.
 
-Creates synthetic product catalog data using Faker with intentionally injected quality issues.
+Examples:
 
-**Injected defects**
+Price cannot be negative.
+Category cannot be empty.
+Image URL must follow a valid format.
 
-- Missing title
-- Missing category
-- Missing price
-- Negative price
-- Broken image URL
+A rule-based validator provides explainable and reliable quality checks before introducing more complex ML-based approaches.
 
----
-### 2. Validate Quality
+**Why Auto Remediation?**
 
-Runs rule-based validation checks to identify invalid records.
+Not every defect requires human intervention.
 
----
-### 3. Classify Defects
+Certain issues can be corrected automatically while preserving data lineage.
 
-Groups detected issues into categories such as:
+Examples:
 
-- missing_title
-- missing_price
-- missing_category
-- negative_price
-- broken_image_url
+Missing category → Default category
+Negative price → Absolute value
 
----
-### 4. Auto Remediation
+This reduces manual effort while maintaining auditability.
 
-Automatically fixes deterministic issues.
+**Why DuckDB?**
 
-| Defect | Action |
-|---------|--------|
-| Missing Category | Set to "Uncategorized" |
-| Negative Price | Convert to positive value |
+DuckDB provides analytical performance without requiring external infrastructure.
 
-All changes are logged in an audit file.
+It allows local SQL analytics and integrates naturally with dbt for modeling.
 
----
-### 5. Data Modeling
+**Why dbt?**
 
-Loads cleaned data into DuckDB and creates analytics-ready models using dbt.
+Raw validated data isn't optimized for reporting.
 
----
-### 6. Dashboard
+dbt transforms operational tables into analytics-ready models while documenting lineage and testing transformations.
 
-Visualizes:
+**Why Airflow?**
 
-- Defect rate by category
-- Vendor-wise defect summary
-- Overall catalog defect rate
+Instead of manually executing scripts, the entire workflow is orchestrated through Airflow.
 
----
-## Dashboard
+This enables:
 
-### Airflow Pipeline
+Scheduling
+Dependency management
+Retry mechanisms
+Pipeline monitoring
+Key Features
+Multi-vendor catalog simulation
+Automated quality validation
+Rule-based defect classification
+Automatic remediation
+Audit logging
+dbt data modeling
+Airflow orchestration
+Interactive Streamlit dashboard
+Modular pipeline design
+Challenges I Solved
+Building realistic test data
 
-![Airflow](docs/screenshots/airflow_dag_success.png)
+Random records aren't enough.
 
----
-### Defect Rate by Category
+The challenge was generating synthetic data that closely resembles real e-commerce catalogs while injecting meaningful defects.
 
-![Dashboard](docs/screenshots/streamlit_dashboard_chart.png)
+Designing reusable validation rules
 
----
-### Defect Breakdown
+Validation logic was modularized so new quality rules can be added without changing the overall pipeline.
 
-![Breakdown](docs/screenshots/streamlit_defect_breakdown.png)
+Maintaining auditability
 
----
-## Pipeline Metrics
+Every automatic correction is logged to preserve transparency and allow future debugging.
 
-| Metric | Value |
-|---------|------:|
-| Vendors | 10 |
-| Categories | 7 |
-| Overall Defect Rate | 12.1% |
-| Airflow Tasks | 5 |
-| Pipeline Status | Successful |
-| Runtime | 2 min 42 sec |
+Keeping transformations reproducible
 
----
-## Run Locally
+Using dbt ensures every transformation is version-controlled and reproducible.
 
-Clone the repository
+Results
 
-```bash
-git clone https://github.com/<username>/catalog-dq-pipeline.git
-cd catalog-dq-pipeline
-```
+Pipeline successfully processed catalog data from:
 
-Install dependencies
+10 Vendors
+7 Product Categories
 
-```bash
-pip install -r requirements.txt
-```
+Generated:
 
-Run manually
+Validation Reports
+Defect Classification Reports
+Remediation Audit Logs
+Analytics Models
+Interactive Dashboard
 
-```bash
-python data_generator.py
-python data_quality/validate.py
-python defect_detection/classify.py
-python remediation/remediate.py
+Overall catalog defect rate reduced to 12.1% after remediation.
 
-cd dbt_project
-python load_seed.py
+**Future Improvements**
 
-cd catalog_dq
-dbt run --profiles-dir .
-dbt test --profiles-dir .
-```
+If this platform were deployed in production, I would extend it by adding:
 
-Start dashboard
-
-```bash
-cd dashboard
-streamlit run app.py
-```
-
-Run through Airflow
-
-```bash
-cd orchestration
-docker compose up -d
-```
-
-Open:
-
-- Airflow → `http://localhost:8080`
-- Dashboard → `http://localhost:8501`
-
----
-## Future Improvements
-
-- Kafka streaming ingestion
-- Great Expectations integration
-- CI/CD with GitHub Actions
-- Cloud deployment (AWS)
-- Historical quality monitoring
-- ML-based anomaly detection
-
----
+Great Expectations for enterprise-grade validation
+Kafka-based streaming ingestion
+AWS S3 data lake integration
+Glue Data Catalog
+Athena analytics
+Historical quality trend monitoring
+CI/CD with GitHub Actions
+ML-based anomaly detection
+Slack/Email alerts for data quality failures
